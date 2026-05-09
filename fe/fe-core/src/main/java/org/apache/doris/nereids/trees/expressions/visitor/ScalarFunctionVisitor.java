@@ -496,6 +496,7 @@ import org.apache.doris.nereids.trees.expressions.functions.scalar.StAswkt;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StAzimuth;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StCircle;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StContains;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StDifference;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDisjoint;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDistance;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDistanceSphere;
@@ -504,8 +505,10 @@ import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryFro
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryType;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryfromtext;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeomfromtext;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StIntersection;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StIntersects;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLength;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StSymDifference;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLinefromtext;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLinestringfromtext;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StPoint;
@@ -2363,6 +2366,14 @@ public interface ScalarFunctionVisitor<R, C> {
         return visitScalarFunction(stContains, context);
     }
 
+    default R visitStDifference(StDifference stDifference, C context) {
+        return visitScalarFunction(stDifference, context);
+    }
+
+    default R visitStIntersection(StIntersection stIntersection, C context) {
+        return visitScalarFunction(stIntersection, context);
+    }
+
     default R visitStIntersects(StIntersects stIntersects, C context) {
         return visitScalarFunction(stIntersects, context);
     }
@@ -2373,6 +2384,10 @@ public interface ScalarFunctionVisitor<R, C> {
 
     default R visitStTouches(StTouches stTouches, C context) {
         return visitScalarFunction(stTouches, context);
+    }
+
+    default R visitStSymDifference(StSymDifference stSymDifference, C context) {
+        return visitScalarFunction(stSymDifference, context);
     }
 
     default R visitStLength(StLength stLength, C context) {

@@ -476,6 +476,7 @@ import org.apache.doris.nereids.trees.expressions.functions.scalar.StAswkt;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StAzimuth;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StCircle;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StContains;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StDifference;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDisjoint;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDistance;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StDistanceSphere;
@@ -484,9 +485,11 @@ import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryFro
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryType;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeometryfromtext;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StGeomfromtext;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StIntersection;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StIntersects;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLength;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLinefromtext;
+import org.apache.doris.nereids.trees.expressions.functions.scalar.StSymDifference;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StLinestringfromtext;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StPoint;
 import org.apache.doris.nereids.trees.expressions.functions.scalar.StPolyfromtext;
@@ -1053,9 +1056,12 @@ public class BuiltinScalarFunctions implements FunctionHelper {
             scalar(StAswkt.class, "st_aswkt"),
             scalar(StCircle.class, "st_circle"),
             scalar(StContains.class, "st_contains"),
+            scalar(StDifference.class, "st_difference"),
+            scalar(StIntersection.class, "st_intersection"),
             scalar(StIntersects.class, "st_intersects"),
             scalar(StDisjoint.class, "st_disjoint"),
             scalar(StTouches.class, "st_touches"),
+            scalar(StSymDifference.class, "st_symdifference"),
             scalar(StLength.class, "st_length"),
             scalar(StGeometryType.class, "st_geometrytype"),
             scalar(StDistance.class, "st_distance"),

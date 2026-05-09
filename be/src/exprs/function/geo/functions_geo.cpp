@@ -917,6 +917,91 @@ private:
     }
 };
 
+
+template <typename OpImpl>
+struct StBooleanOpFunction {
+    static constexpr auto NAME = OpImpl::NAME;
+    static const size_t NUM_ARGS = 2;
+    using Type = DataTypeString;
+
+    static Status execute(Block& block, const ColumnNumbers& arguments, size_t result) {
+        DCHECK_EQ(arguments.size(), 2);
+        auto left_col = ColumnView<TYPE_STRING>::create(block.get_by_position(arguments[0]).column);
+        auto right_col =
+                ColumnView<TYPE_STRING>::create(block.get_by_position(arguments[1]).column);
+
+        const auto size = left_col.size();
+        auto res = ColumnString::create();
+        auto null_map = ColumnUInt8::create(size, 0);
+        auto& null_map_data = null_map->get_data();
+
+        for (int row = 0; row < size; ++row) {
+            auto lhs_value = left_col.value_at(row);
+            auto rhs_value = right_col.value_at(row);
+
+            std::unique_ptr<GeoShape> shape1(
+                    GeoShape::from_encoded(lhs_value.data, lhs_value.size));
+            std::unique_ptr<GeoShape> shape2(
+                    GeoShape::from_encoded(rhs_value.data, rhs_value.size));
+
+                null_map_data[row] = 1;
+                res->insert_default();
+                continue;
+            }
+
+            auto result_shape = OpImpl::evaluate(shape1.get(), shape2.get());
+                null_map_data[row] = 1;
+                res->insert_default();
+                continue;
+            }
+
+            std::string buf;
+            result_shape->encode_to(&buf);
+            res->insert_data(buf.data(), buf.size());
+        }
+
+        block.replace_by_position(result,
+                                  ColumnNullable::create(std::move(res), std::move(null_map)));
+        return Status::OK();
+    }
+};
+
+struct StIntersectionImpl {
+    static constexpr auto NAME = "st_intersection";
+    static std::unique_ptr<GeoShape> evaluate(GeoShape* s1, GeoShape* s2) {
+        if (s1->type() != GEO_SHAPE_POLYGON || s2->type() != GEO_SHAPE_POLYGON) {
+            return nullptr;
+        }
+        const auto* poly1 = assert_cast<const GeoPolygon*>(s1);
+        const auto* poly2 = assert_cast<const GeoPolygon*>(s2);
+        return GeoPolygon::st_intersection(*poly1, *poly2);
+    }
+};
+
+struct StDifferenceImpl {
+    static constexpr auto NAME = "st_difference";
+    static std::unique_ptr<GeoShape> evaluate(GeoShape* s1, GeoShape* s2) {
+        if (s1->type() != GEO_SHAPE_POLYGON || s2->type() != GEO_SHAPE_POLYGON) {
+            return nullptr;
+        }
+        const auto* poly1 = assert_cast<const GeoPolygon*>(s1);
+        const auto* poly2 = assert_cast<const GeoPolygon*>(s2);
+        return GeoPolygon::st_difference(*poly1, *poly2);
+    }
+};
+
+struct StSymDifferenceImpl {
+    static constexpr auto NAME = "st_symdifference";
+    static std::unique_ptr<GeoShape> evaluate(GeoShape* s1, GeoShape* s2) {
+        if (s1->type() != GEO_SHAPE_POLYGON || s2->type() != GEO_SHAPE_POLYGON) {
+            return nullptr;
+        }
+        const auto* poly1 = assert_cast<const GeoPolygon*>(s1);
+        const auto* poly2 = assert_cast<const GeoPolygon*>(s2);
+        return GeoPolygon::st_sym_difference(*poly1, *poly2);
+    }
+};
+
 void register_function_geo(SimpleFunctionFactory& factory) {
     factory.register_function<GeoFunction<StPoint>>();
     factory.register_function<GeoFunction<StAsText<StAsWktName>>>();
@@ -947,6 +1032,9 @@ void register_function_geo(SimpleFunctionFactory& factory) {
     factory.register_function<GeoFunction<StLength>>();
     factory.register_function<GeoFunction<StGeometryType>>();
     factory.register_function<GeoFunction<StDistance>>();
+    factory.register_function<GeoFunction<StBooleanOpFunction<StIntersectionImpl>>>();
+    factory.register_function<GeoFunction<StBooleanOpFunction<StDifferenceImpl>>>();
+    factory.register_function<GeoFunction<StBooleanOpFunction<StSymDifferenceImpl>>>();
 }
 
 } // namespace doris

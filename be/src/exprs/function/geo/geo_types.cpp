@@ -2001,5 +2001,36 @@ double GeoCircle::Distance(const GeoShape* rhs) const {
     }
 }
 
+std::unique_ptr<GeoPolygon> GeoPolygon::st_intersection(const GeoPolygon& a, const GeoPolygon& b) {
+    auto result = GeoPolygon::create_unique();
+    result->_polygon = std::make_unique<S2Polygon>();
+    result->_polygon->InitToIntersection(*a._polygon, *b._polygon);
+    if (result->_polygon->num_loops() == 0) {
+        return nullptr;
+    }
+    return result;
+}
+
+std::unique_ptr<GeoPolygon> GeoPolygon::st_difference(const GeoPolygon& a, const GeoPolygon& b) {
+    auto result = GeoPolygon::create_unique();
+    result->_polygon = std::make_unique<S2Polygon>();
+    result->_polygon->InitToDifference(*a._polygon, *b._polygon);
+    if (result->_polygon->num_loops() == 0) {
+        return nullptr;
+    }
+    return result;
+}
+
+std::unique_ptr<GeoPolygon> GeoPolygon::st_sym_difference(const GeoPolygon& a,
+                                                          const GeoPolygon& b) {
+    auto result = GeoPolygon::create_unique();
+    result->_polygon = std::make_unique<S2Polygon>();
+    result->_polygon->InitToSymmetricDifference(*a._polygon, *b._polygon);
+    if (result->_polygon->num_loops() == 0) {
+        return nullptr;
+    }
+    return result;
+}
+
 #include "common/compile_check_avoid_end.h"
 } // namespace doris

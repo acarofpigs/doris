@@ -199,6 +199,12 @@ public:
     double Distance(const GeoShape* rhs) const override;
     S2Loop* getLoop(int i) const;
 
+    // Boolean operations (Polygon × Polygon)
+    // Returns nullptr if result is empty
+    static std::unique_ptr<GeoPolygon> st_intersection(const GeoPolygon& a, const GeoPolygon& b);
+    static std::unique_ptr<GeoPolygon> st_difference(const GeoPolygon& a, const GeoPolygon& b);
+    static std::unique_ptr<GeoPolygon> st_sym_difference(const GeoPolygon& a, const GeoPolygon& b);
+
 protected:
     void encode(std::string* buf) override;
     bool decode(const void* data, size_t size) override;
